@@ -32,7 +32,7 @@ MFCaptureToFile.vcproj
 readme.txt
 resource.h
 stdafx.h
-winmain.cpp
+main.cpp
 
 ## To build the sample using the command prompt
 
