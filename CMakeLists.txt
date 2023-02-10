@@ -82,30 +82,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 set(PROJECT_NAME MFCaptureToFile)
 
 ################################################################################
@@ -113,7 +89,6 @@ set(PROJECT_NAME MFCaptureToFile)
 ################################################################################
 set(Headers
     "capture.h"
-    "resource.h"
 )
 source_group("Headers" FILES ${Headers})
 

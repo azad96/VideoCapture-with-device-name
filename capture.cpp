@@ -11,22 +11,19 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#include <mfapi.h>
-#include <mfidl.h>
-#include <mfobjects.h>
-#include <Dbt.h>
-
 #include "capture.h"
 
-#pragma comment(lib, "mf")
-#pragma comment(lib, "mfplat")
+#include <mfidl.h>
+
+#include <codecvt>
+
 
 template <class T> void SafeRelease(T **ppT)
 {
     if (*ppT)
     {
         (*ppT)->Release();
-        *ppT = NULL;
+        *ppT = nullptr;
     }
 }
 
@@ -38,7 +35,7 @@ void DeviceList::Clear()
         SafeRelease(&m_ppDevices[i]);
     }
     CoTaskMemFree(m_ppDevices);
-    m_ppDevices = NULL;
+    m_ppDevices = nullptr;
 
     m_cDevices = 0;
 }
@@ -47,7 +44,7 @@ void DeviceList::Clear()
 HRESULT DeviceList::EnumerateDevices()
 {
     HRESULT hr = S_OK;
-    IMFAttributes *pAttributes = NULL;
+    IMFAttributes *pAttributes = nullptr;
 
     Clear();
 
@@ -103,8 +100,35 @@ HRESULT DeviceList::GetDeviceName(UINT32 index, WCHAR **ppszName)
     hr = m_ppDevices[index]->GetAllocatedString(
         MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, 
         ppszName, 
-        NULL
+        nullptr
         );
 
     return hr;
+}
+
+
+std::vector<std::string> DeviceList::GetVideoDevices() {
+    std::vector<std::string> videoDevices;
+    HRESULT hr = S_OK;
+    WCHAR* szFriendlyName = nullptr;
+
+    hr = EnumerateDevices();
+
+    if (FAILED(hr)) {
+        return videoDevices;
+    }
+
+    for (UINT32 iDevice = 0; iDevice < Count(); iDevice++)
+    {
+        hr = GetDeviceName(iDevice, &szFriendlyName);
+
+        if (FAILED(hr)) { return videoDevices; }
+
+        std::wstring ws(szFriendlyName);
+        std::string deviceName = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(ws);
+        videoDevices.push_back(deviceName);
+        CoTaskMemFree(szFriendlyName);
+        szFriendlyName = nullptr;
+    }
+    return videoDevices;
 }

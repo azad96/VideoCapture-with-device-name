@@ -11,16 +11,13 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-
 #pragma once
 
-struct EncodingParameters
-{
-    GUID    subtype;
-    UINT32  bitrate;
-};
+#include <mfapi.h>
 
-const UINT WM_APP_PREVIEW_ERROR = WM_APP + 1;    // wparam = HRESULT
+#include <string>
+#include <vector>
+
 
 class DeviceList
 {
@@ -28,14 +25,8 @@ class DeviceList
     IMFActivate **m_ppDevices;
 
 public:
-    DeviceList() : m_ppDevices(NULL), m_cDevices(0)
-    {
-
-    }
-    ~DeviceList()
-    {
-        Clear();
-    }
+    DeviceList() :  m_cDevices(0), m_ppDevices(nullptr) {}
+    ~DeviceList() { Clear(); }
     
     UINT32  Count() const { return m_cDevices; }
 
@@ -43,4 +34,5 @@ public:
     HRESULT EnumerateDevices();
     HRESULT GetDevice(UINT32 index, IMFActivate **ppActivate);
     HRESULT GetDeviceName(UINT32 index, WCHAR **ppszName);
+    std::vector<std::string> GetVideoDevices();
 };

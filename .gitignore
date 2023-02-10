@@ -1,7 +1,4 @@
-.vs
 .vscode
 build*
 x64
 CMakeLists.txt.user
-MFCaptureToFile.sln.cache
-MFCaptureToFile.vcxproj.user
