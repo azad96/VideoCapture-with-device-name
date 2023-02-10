@@ -1,7 +1,5 @@
 //////////////////////////////////////////////////////////////////////////
 //
-// capture.cpp: Manages video capture.
-// 
 // THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
 // ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
 // THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
@@ -11,7 +9,7 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#include "capture.h"
+#include "devicelist.h"
 
 #include <mfidl.h>
 
@@ -25,6 +23,33 @@ template <class T> void SafeRelease(T **ppT)
         (*ppT)->Release();
         *ppT = nullptr;
     }
+}
+
+
+std::vector<std::string> DeviceList::GetVideoDevices() {
+    std::vector<std::string> videoDevices;
+    HRESULT hr = S_OK;
+    WCHAR* szFriendlyName = nullptr;
+
+    hr = EnumerateDevices();
+
+    if (FAILED(hr)) {
+        return videoDevices;
+    }
+
+    for (UINT32 iDevice = 0; iDevice < Count(); iDevice++)
+    {
+        hr = GetDeviceName(iDevice, &szFriendlyName);
+
+        if (FAILED(hr)) { return videoDevices; }
+
+        std::wstring ws(szFriendlyName);
+        std::string deviceName = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(ws);
+        videoDevices.push_back(deviceName);
+        CoTaskMemFree(szFriendlyName);
+        szFriendlyName = nullptr;
+    }
+    return videoDevices;
 }
 
 
@@ -104,31 +129,4 @@ HRESULT DeviceList::GetDeviceName(UINT32 index, WCHAR **ppszName)
         );
 
     return hr;
-}
-
-
-std::vector<std::string> DeviceList::GetVideoDevices() {
-    std::vector<std::string> videoDevices;
-    HRESULT hr = S_OK;
-    WCHAR* szFriendlyName = nullptr;
-
-    hr = EnumerateDevices();
-
-    if (FAILED(hr)) {
-        return videoDevices;
-    }
-
-    for (UINT32 iDevice = 0; iDevice < Count(); iDevice++)
-    {
-        hr = GetDeviceName(iDevice, &szFriendlyName);
-
-        if (FAILED(hr)) { return videoDevices; }
-
-        std::wstring ws(szFriendlyName);
-        std::string deviceName = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(ws);
-        videoDevices.push_back(deviceName);
-        CoTaskMemFree(szFriendlyName);
-        szFriendlyName = nullptr;
-    }
-    return videoDevices;
 }
